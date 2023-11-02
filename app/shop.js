@@ -54,9 +54,29 @@ $.ajax({
     type: "GET",
     url: url,
     success: function (response) {
-        renderProducts(response.records);
+        const records = response.records;
+        const fixedRecords = fixImageUrls(records);
+        renderProducts(fixedRecords);
     }
 });
+
+function fixImageUrls(records) {
+    records.forEach((record)=> {
+        record.image = constructImageUrl(record.image);
+    });
+    return records
+}
+
+function constructImageUrl(imageUrl) {
+
+    const segments = imageUrl.split('/');
+    const imageIdSegment = segments[5];
+    //imageId = imageIdSegment.substring(2);
+    console.log(imageIdSegment);
+    const constructedImageUrl = `https://drive.google.com/uc?id=${imageIdSegment}`;
+    console.log(constructedImageUrl);
+    return constructedImageUrl;
+}
 
 allProducts.addEventListener("click", (e) => {
     e.preventDefault();

@@ -56,9 +56,27 @@ $.ajax({
     id: id,
   }),
   success: function (response) {
-    renderProductDetails(response);
+    const fixedRecords = fixSingleImageUrl(response);
+    console.log(fixedRecords);
+    renderProductDetails(fixedRecords);
   },
 });
+
+function fixSingleImageUrl(record) {
+  record.image = constructImageUrl(record.image);
+  return record
+}
+
+function constructImageUrl(imageUrl) {
+
+  const segments = imageUrl.split('/');
+  const imageIdSegment = segments[5];
+  //imageId = imageIdSegment.substring(2);
+  console.log(imageIdSegment);
+  const constructedImageUrl = `https://drive.google.com/uc?id=${imageIdSegment}`;
+  console.log(constructedImageUrl);
+  return constructedImageUrl;
+}
 
 function renderProducts(products) {
   products.forEach((product) => {
@@ -93,9 +111,18 @@ $.ajax({
     tag: "featured",
   }),
   success: function (response) {
-    renderProducts(response.records);
+    const records = response.records;
+    const fixedRecords = fixImageUrls(records);
+    renderProducts(fixedRecords);
   },
 });
+
+function fixImageUrls(records) {
+  records.forEach((record)=> {
+      record.image = constructImageUrl(record.image);
+  });
+  return records
+}
 
 function passId(id) {
   var url = new URL("http://127.0.0.1:5500/sproduct.html");

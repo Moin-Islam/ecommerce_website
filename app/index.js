@@ -6,12 +6,13 @@ let newProduct = document.querySelector("#newProduct");
 let outputFeaturedProducts = "";
 let outputNewProducts = "";
 let productId;
+let imageId;
 
 function renderProducts(products) {
     products.forEach((product)=> {
         outputFeaturedProducts += `
         <div class="pro">
-                <img src=${product.image} alt="">
+                <img src="${product.image}" alt="">
                 <div class="des" data-id = ${product.id}>
                     <span>${product.name}</span>
                     <h5>${product.description}</h5>
@@ -35,7 +36,7 @@ function renderNewProducts(products) {
     products.forEach((product)=>{
         outputNewProducts += `
         <div class="pro">
-                <img src=${product.image} alt="">
+                <img src= "${product.image}" alt="">
                 <div class="des" data-id = ${product.id}>
                     <span>${product.name}</span>
                     <h5>${product.description}</h5>
@@ -56,6 +57,14 @@ function renderNewProducts(products) {
     newProduct.innerHTML = outputNewProducts;
 }
 
+/*function renderImage(imageBig) {
+
+    var image = new Image();
+    image.src = 'data:image/jpg;base64,'+ imageBig;
+    return image
+}*/
+
+
 $.ajax({
     type: "POST",
     url: url,
@@ -65,9 +74,30 @@ $.ajax({
         "tag" : "featured"
     }),
     success: function (response) {
-        renderProducts(response.records);
+        const records = response.records;
+        const fixedRecords = fixImageUrls(records);
+        console.log(fixedRecords);
+        renderProducts(fixedRecords);
     }
 });
+
+function fixImageUrls(records) {
+    records.forEach((record)=> {
+        record.image = constructImageUrl(record.image);
+    });
+    return records
+}
+
+function constructImageUrl(imageUrl) {
+
+    const segments = imageUrl.split('/');
+    const imageIdSegment = segments[5];
+    //imageId = imageIdSegment.substring(2);
+    console.log(imageIdSegment);
+    const constructedImageUrl = `https://drive.google.com/uc?id=${imageIdSegment}`;
+    console.log(constructedImageUrl);
+    return constructedImageUrl;
+}
 
 $.ajax({
     type: "POST",
@@ -78,7 +108,9 @@ $.ajax({
         "tag" : "new arrival"
     }),
     success: function (response) {
-        renderNewProducts(response.records);
+        const records = response.records;
+        const fixedRecords = fixImageUrls(records);
+        renderNewProducts(fixedRecords);
     }
 });
 
