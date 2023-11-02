@@ -14,6 +14,8 @@ let featuredProduct = document.querySelector("#featuredProduct");
 let productId;
 let outputFeaturedProducts = "";
 let output = "";
+let size = "";
+let quantity = 1;
 
 
 function renderProductDetails(product) {
@@ -26,14 +28,14 @@ function renderProductDetails(product) {
             <h6>${product.tag}</h6>
             <h4>${product.name}</h4>
             <h2>$${product.price}</h2>
-            <select>
+            <select id="size">
                 <option>Select Size</option>
                 <option>XL</option>
                 <option>XXL</option>
                 <option>Small</option>
                 <option>Large</option>
             </select>
-            <input type="number" value="1">
+            <input type="number" value=1 id="quantityAmount">
             <button class="normal" onclick="cartButton()">Add to Cart</button>
             <h4>Product Details</h4>
             <span>${product.description}</span>
@@ -42,6 +44,8 @@ function renderProductDetails(product) {
     <input type="hidden" id="product-id" value="${product.id}">
     <input type="hidden" id="product-name" value="${product.name}">
     <input type="hidden" id="product-price" value="${product.price}">
+    <input type="hidden" id="product-size" value="">
+    <input type="hidden" id="product-quantity" value="">
 
     `;
   productDetails.innerHTML = output;
@@ -137,12 +141,27 @@ featuredProduct.addEventListener("click", (e) => {
   passId(productId);
 });
 
+productDetails.addEventListener("change", (e) => {
+  e.preventDefault();
+  if(e.target.tagName == "SELECT"){
+    size = document.getElementById("size").value;
+  }
+})
+
+productDetails.addEventListener("change", (e) => {
+  if(e.target.tagName == "INPUT" && e.target.type ==="number") {
+    quantity = Number(document.getElementById("quantityAmount").value);
+  }
+});
+
 function cartButton() {
   const productId = document.getElementById("product-id").value;
   const productName = document.getElementById("product-name").value;
-  const productPrice = document.getElementById("product-price").value;
+  const productPrice = Number(document.getElementById("product-price").value);
 
   let cartItems = JSON.parse(localStorage.getItem('cartItems'));
+
+  const expense = productPrice* quantity;
 
   if(cartItems == null){
     cartItems = [];
@@ -151,10 +170,14 @@ function cartButton() {
   cartItems.push({
     id : productId,
     name: productName,
-    price : productPrice
+    price : productPrice,
+    size : size,
+    quantity : quantity,
+    expense : expense
   });
 
   localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  console.log(cartItems);
 
   alert("Product added in the cart");
 }
